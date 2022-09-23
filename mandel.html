@@ -1,0 +1,76 @@
+<!DOCTYPE html>	
+<head>
+	<meta name=viewport content="width=device-width,initial-scale=1">  
+	<meta charset="utf-8"/>
+	<script src="https://www.geogebra.org/apps/deployggb.js"></script>
+</head>
+<body>
+	<div id="ggb-element"></div> 
+</body>
+<footer>
+	<script>  
+		var params = {
+				"appName": "geometry", 
+				"width": 1600, "height": 600, 
+				"showToolBar": false, 
+				"showAlgebraInput": true, 
+				"showMenuBar": false
+			};
+
+		params.appletOnLoad = go
+		var applet = new GGBApplet('5.0',params, true);
+		window.addEventListener("load", function() { 
+    		applet.inject('ggb-element');
+		});
+
+		function go(api) {
+			api.registerClientListener("mandel")
+
+		}
+ 		
+		function squareAndAddC(z, c) {
+			X = z.x*z.x - z.y*z.y + c.x
+			Y = 2*z.x*z.y + c.y
+			return {x:X,y:Y}
+		}
+
+		function abs2(z) {
+
+			return z.x*z.x + z.y * z.y
+		}
+
+		function mandel(event) {
+			const API = applet.getAppletObject()
+			if (event[0] == "mouseDown") {
+				names = API.getAllObjectNames()
+				for (i = 0; i < names.length; i++) {
+					API.deleteObject(names[i])
+				}
+
+
+				console.log(event)
+				x = event.x
+				y = event.y
+				c = {x:x, y:y}
+				z = c
+				command = "Z0=(" + x + "," + y + ")"
+				console.log(command)
+				API.evalCommand(command)
+				for (i = 1; (i < 100 && abs2(z)< 4); i++) {
+					z = squareAndAddC(z,c)
+					command = "Z" + i + "=(" + z.x + "," + z.y + ")"
+					console.log(command)
+					API.evalCommand(command)
+					API.setLabelVisible("Z"+i, false)
+					if (i > 0) {
+						command = "s" + i + " = Segment(Z" + i + ", Z" + (i-1) + ")"
+						console.log(command)
+						API.evalCommand(command)
+						API.setLabelVisible("s"+i, false)
+					}	
+				}
+			}
+		}
+</script>
+</footer>
+</html>
